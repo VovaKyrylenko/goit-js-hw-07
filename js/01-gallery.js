@@ -3,26 +3,32 @@ import { galleryItems } from "./gallery-items.js";
 // Change code below this line
 const parent = document.querySelector(".gallery");
 galleryItems.forEach((item) => {
+  const wrapper = document.createElement("div");
+  wrapper.className = "gallery__item";
   const link = document.createElement("a");
   link.className = "gallery__link";
-  link.insertAdjacentHTML(
-    "beforeend",
-    `<img src='${item.preview}' class="gallery__image" alt="${item.description}"/>`
-  );
-  parent.appendChild(link);
+  link.href = item.original;
+  const img = document.createElement("img");
+  img.src = item.preview;
+  img.alt = item.description;
+  img.className = "gallery__image";
+  img.setAttribute("data-source", item.original);
+  link.appendChild(img);
+  wrapper.appendChild(link);
+  parent.appendChild(wrapper);
 });
 
 parent.addEventListener("click", (evt) => {
+  evt.preventDefault();
   if (evt.target.classList.contains("gallery__image")) {
-    galleryItems.forEach((item) => {
-      if (evt.target.src === item.preview) {
-        const instance = basicLightbox.create(
-          `<img src="${item.original}" class="gallery__item">`
-        );
-        instance.show();
-        console.log("instance:", instance.show());
+    const instance = basicLightbox.create(
+      `<img src="${evt.target.getAttribute("data-source")}">`
+    );
+    instance.show();
+    document.addEventListener("keydown", (event) => {
+      if (event.code == "Escape") {
+        instance.close();
       }
     });
   }
 });
-console.log(galleryItems);
